@@ -1,80 +1,114 @@
-import cv2
-import cv2.so as cv
-import numpy as np
-import sys
-import time
-        
-     
-if __name__ == "__main__":
+# define the lower and upper boundaries of the "green"
+# ball in the HSV color space
+greenLower = (29, 86, 6)
+greenUpper = (64, 255, 255)
  
-    print "Press ESC to exit ..."
+pts = deque(maxlen=32)  # Deque containing last 32 point history
+counter = 0  # Frame counter
+(dX, dY) = (0, 0)  # Velocity of movement in x,y directions
+direction = ""
  
-    # create windows
-    cv.NamedWindow('Original', cv.CV_WINDOW_AUTOSIZE)
-    cv.NamedWindow('Threshold', cv.CV_WINDOW_AUTOSIZE)
- 
-    # create capture device
-    capture = cv.CreateCameraCapture(0) # assume we want first device
-    cv.SetCaptureProperty(capture, cv.CV_CAP_PROP_FRAME_WIDTH, 640)
-    cv.SetCaptureProperty(capture, cv.CV_CAP_PROP_FRAME_HEIGHT, 480)
- 
-    # check if capture device is OK
-    if not capture:
-        print "Error opening capture device"
-        sys.exit(1)
-        
-    while 1:
-        # do forever
- 
-        #capture the current frame
-        frame = cv.QueryFrame(capture)
-        
-        if frame is None:
-            break
- 
-        # mirror
-        cv.Flip(frame, None, 1)
-        
-        originalImage = frame
- 
-        hsvImage = cv.CreateImage(cv.GetSize(originalImage), 8, 3)
-        cv.CvtColor(originalImage, hsvImage, cv.CV_BGR2HSV)
-                            
-        thresholdImage = cv.CreateImage(cv.GetSize(originalImage), 8, 1)
-        cv.InRangeS(hsvImage, cv.Scalar(20.74, 75, 75), cv.Scalar(30.74, 255, 255), thresholdImage)
-                                       
-        thresholdImageArray = np.asarray(cv.GetMat(thresholdImage))
-        thresholdImageArray = cv2.GaussianBlur(thresholdImageArray, (0,0), 2)
+capture = cv2.VideoCapture(0)  # Create 
 
-        thresholdImage = cv.fromarray(thresholdImageArray)
-        
-        circles = cv2.HoughCircles(thresholdImageArray,cv.CV_HOUGH_GRADIENT,2,10,param1=40,param2=80,minRadius=4,maxRadius=1500)
-        
-        if circles is not None:
-            if circles.size > 0:
-                circles = np.uint16(np.around(circles))
-            
-            for i in circles[0,:]:
-                imageArray = np.asarray(cv.GetMat(originalImage))
-                # draw the outer circle
-                cv2.circle(imageArray,(i[0],i[1]),i[2],(0,255,0),2)
-                # draw the center of the circle
-                cv2.circle(imageArray,(i[0],i[1]),2,(0,0,255),3) 
-                output = "X" + i[0].str() + "Y" + i[1].str()
-                print "output = '" + output + "'"
-                time.sleep(1)
-        
-        # display webcam image
-        cv.ShowImage('Original', originalImage)
-        cv.ShowImage('Threshold', thresholdImage)
+while True:
+    # grab the current frame
+    (grabbed, frame) = capture.read()
  
-        # handle events
-        #    As long as camera window has focus (e.g. is selected), this will intercept
-        #        pressed key; it will not work if the python terminal window has focus
-        k = cv.WaitKey(100)
-         
-        if k == 0x1b: # ESC
-            print 'ESC pressed. Exiting ...'
-            cv.DestroyWindow("Original")
-            cv.DestroyWindow("Threshold")
-            break
+    # resize the frame, blur it, and convert it to the HSV
+    # color space
+    frame = imutils.resize(frame, width=600)
+    blurred = cv2.GaussianBlur(frame, (11, 11), 0)
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+ 
+    # construct a mask for the color "green", then perform
+    # a series of dilations and erosions to remove any small
+    # blobs left in the mask
+    mask = cv2.inRange(hsv, greenLower, greenUpper)
+    mask = cv2.erode(mask, None, iterations=2)
+    mask = cv2.dilate(mask, None, iterations=2)
+ 
+    # find contours in the mask and initialize the current
+    # (x, y) center of the ball
+    cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
+        cv2.CHAIN_APPROX_SIMPLE)[-2]
+    center = None
+
+    # only proceed if at least one contour was found
+    if len(cnts) > 0:
+        # find the largest contour in the mask, then use
+        # it to compute the minimum enclosing circle and
+        # centroid
+        c = max(cnts, key=cv2.contourArea)
+        ((x, y), radius) = cv2.minEnclosingCircle(c)
+        M = cv2.moments(c)
+        center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
+ 
+        # only proceed if the radius meets a minimum size
+        if radius > 10:
+            # draw the circle and centroid on the frame,
+            # then update the list of tracked points
+            cv2.circle(frame, (int(x), int(y)), int(radius),
+                (0, 255, 255), 2)
+            cv2.circle(frame, center, 5, (0, 0, 255), -1)
+            pts.appendleft(center)
+
+
+            # loop over the set of tracked points
+    for i in np.arange(1, len(pts)):
+        # if either of the tracked points are None, ignore
+        # them
+        if pts[i - 1] is None or pts[i] is None:
+            continue
+ 
+        # check to see if enough points have been accumulated in
+        # the buffer
+        if counter >= 10 and i == 1 and pts[-10] is not None:
+            # compute the difference between the x and y
+            # coordinates and re-initialize the direction
+            # text variables
+            dX = pts[-10][0] - pts[i][0]
+            dY = pts[-10][1] - pts[i][1]
+            (dirX, dirY) = ("", "")
+ 
+            # ensure there is significant movement in the
+            # x-direction
+            if np.abs(dX) > 20:
+                dirX = "East" if np.sign(dX) == 1 else "West"
+ 
+            # ensure there is significant movement in the
+            # y-direction
+            if np.abs(dY) > 20:
+                dirY = "North" if np.sign(dY) == 1 else "South"
+ 
+            # handle when both directions are non-empty
+            if dirX != "" and dirY != "":
+                direction = "{}-{}".format(dirY, dirX)
+ 
+            # otherwise, only one direction is non-empty
+            else:
+                direction = dirX if dirX != "" else dirY
+            
+        # otherwise, compute the thickness of the line and
+        # draw the connecting lines
+        thickness = int(np.sqrt(args["buffer"] / float(i + 1)) * 2.5)
+        cv2.line(frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
+ 
+    # show the movement deltas and the direction of movement on
+    # the frame
+    cv2.putText(frame, direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
+        0.65, (0, 0, 255), 3)
+    cv2.putText(frame, "dx: {}, dy: {}".format(dX, dY),
+        (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX,
+        0.35, (0, 0, 255), 1)
+ 
+    # show the frame to our screen and increment the frame counter
+    cv2.imshow("Frame", frame)
+    key = cv2.waitKey(1) & 0xFF
+    counter += 1
+ 
+    # if the 'q' key is pressed, stop the loop
+    if key == ord("q"):
+        break
+ 
+capture.release()
+cv2.destroyAllWindows()
