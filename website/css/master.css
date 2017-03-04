@@ -1,0 +1,19 @@
+.pink {
+  background: pink;
+}
+
+.page-header {
+  padding: auto;
+  background: url(../images/placeholder.jpg);
+  background-size: cover;
+}
+
+h1 {
+  padding: auto;
+}
+
+/*canvas {
+  height: 100vh;;
+  width: 100%;
+  margin:auto;
+}*/
