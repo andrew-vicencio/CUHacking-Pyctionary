@@ -1,8 +1,7 @@
 import cv2
-import cv2.cv as cv
+import cv2.so as cv
 import numpy as np
 import sys
-import serial
 import time
         
      
@@ -78,5 +77,4 @@ if __name__ == "__main__":
             print 'ESC pressed. Exiting ...'
             cv.DestroyWindow("Original")
             cv.DestroyWindow("Threshold")
-            serialConnection.close()
             break
