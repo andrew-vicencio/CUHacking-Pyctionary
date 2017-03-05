@@ -12,8 +12,8 @@ greenLower = (50, 100, 100)
 greenUpper = (70, 255, 255)
 whiteUpper = (255,255,255)
 whiteLower = (100,100,100)
-blueUpper = (135, 255, 255)
-blueLower = (85, 50, 40)
+blueUpper = (255, 0, 0)
+blueLower = (100, 0, 0)
 
 windowHeight = 480
 windowWidth = 640
@@ -34,9 +34,7 @@ mazeImage = mazeData[0]
 templateContours = mazeData[1]
 finishContours = mazeData[2]
 
-#template = cv2.imread("maze.png", 0)
-#templateContours = cv2.findContours(template,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)[-2]
-# Blank image for drawing shapes
+#print finishContours
 
 while True:
     # get the current frame
@@ -51,7 +49,7 @@ while True:
     if counter % 10 == 0:
 
         wallDiff = compareFrames(templateContours, mazeImage, whiteUpper, whiteLower)
-        #finishDiff = compareFrames(finishContours, mazeImage, blueUpper, blueLower)
+        finishDiff = compareFrames(finishContours, mazeImage, blueUpper, blueLower)
         if(wallDiff != 0):
             print("You hit the wall!")
             touchedWall = True
@@ -64,6 +62,9 @@ while True:
             mazeImage = mazeData[0]
             templateContours = mazeData[1]
             time.sleep(3)
+
+        if(finishDiff != 0):
+            print("finished!")
 
     if counter > 10 and touchedWall is True:
         touchedWall = False

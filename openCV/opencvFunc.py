@@ -35,9 +35,9 @@ def createMaze(windowHeight, windowWidth, mazeNumber):
 	maze_image = np.zeros((windowHeight,windowWidth,3), np.uint8)
 
 	# Create matrix for maze positions
-	g = [[0 for y in range(6)] for x in range(8)]
-	for x in range(8):
-		for y in range(6):
+	g = [[0 for y in xrange(6)] for x in xrange(8)]
+	for x in xrange(8):
+		for y in xrange(6):
    			g[x][y] = (x*windowWidth/8, y*windowHeight/6)
 
 	lines = []
@@ -66,8 +66,8 @@ def createMaze(windowHeight, windowWidth, mazeNumber):
 		start.append([g[1][1],g[2][1]])
 		finish.append([g[5][1],g[6][1]])
 
-	for l in range(len(lines)):
-   		for i in range(len(lines[l])-1):
+	for l in xrange(len(lines)):
+   		for i in xrange(len(lines[l])-1):
    			cv2.line(maze_image, lines[l][i], lines[l][i+1], (255, 255, 255), 10)
    	
    	cv2.line(maze_image, start[0][0], start[0][1], (255, 0, 0), 10)
@@ -76,8 +76,9 @@ def createMaze(windowHeight, windowWidth, mazeNumber):
    	templateContours = cv2.inRange(maze_image, (100,100,100), (255,255,255))
    	templateContours = cv2.findContours(templateContours,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)[-2]
 
-   	finishContours = cv2.inRange(maze_image, (85, 50, 40), (135, 255, 255))
-   	finishContours = cv2.findContours(finishContours,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)[-2]
+   	finish = cv2.inRange(maze_image, (100,0,0), (255, 0, 0))
+   	cv2.imwrite("templateframe.png", finish)
+   	finishContours = cv2.findContours(finish,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)[-2]
 
 	cv2.imwrite("maze.png", maze_image)
 
@@ -86,6 +87,7 @@ def createMaze(windowHeight, windowWidth, mazeNumber):
 def compareFrames(templateContours, frame, upperBounds, lowerBounds):
 
 	frameTemplate = cv2.inRange(frame, lowerBounds, upperBounds)
+	cv2.imwrite("frame.png", frameTemplate)
 	frameContours = cv2.findContours(frameTemplate,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)[-2]
 	diff = cv2.matchShapes(templateContours[0],frameContours[0],1,0.0)
 	return diff
