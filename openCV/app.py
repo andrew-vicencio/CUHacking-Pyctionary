@@ -4,6 +4,8 @@ import cv2, os, os.path, time
 app = Flask(__name__)
 fifo = None
 
+activemap = 0;
+
 @app.route('/getpts', methods=['POST'])
 def pts():
     global fifo
@@ -18,8 +20,18 @@ def pts():
         x = int(cord[0])
         y = int(cord[1])
         w = int(cord[2])
-        return jsonify(x=x, y=y, w=w, e=0)
-    return jsonify(x=0, y=0, w=0, e=1)
+        s = int(cord[3])
+        return jsonify(x=x, y=y, w=w, s=s, e=0)
+    return jsonify(x=0, y=0, w=0, s=0, e=1)
+
+@app.route('/getmaze', methods=['POST'])
+def newmaze():
+    maze = open("maze/maze{}.png".format(activemap%5), "rb")
+    if maze.isOpen():
+        return send_file(IO.BytesIO(maze.read()))
+    else:
+        maze.close()
+        maze = open("maze/maze0.png")
 
 @app.route('/')
 def hi():
