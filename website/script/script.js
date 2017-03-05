@@ -17,12 +17,12 @@ window.onload=function() {
   uiInit();
 
   setInterval(update, 1000/24);
-  // setInterval(getPoints, 1000/24);
-  c.addEventListener('mousemove', function(e) {
-    var rect = c.getBoundingClientRect();
-    hand.x = (e.clientX-rect.left)/(rect.right-rect.left)*c.width;
-    hand.y = (e.clientY-rect.top)/(rect.bottom-rect.top)*c.height;
-  });
+  setInterval(getPoints, 1000/24);
+  // c.addEventListener('mousemove', function(e) {
+  //   var rect = c.getBoundingClientRect();
+  //   hand.x = (e.clientX-rect.left)/(rect.right-rect.left)*c.width;
+  //   hand.y = (e.clientY-rect.top)/(rect.bottom-rect.top)*c.height;
+  // });
 }
 
 function cInit() {
