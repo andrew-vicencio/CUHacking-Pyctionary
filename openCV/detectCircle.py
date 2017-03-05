@@ -54,7 +54,7 @@ while True:
             touchedWall = True
             counter = 0
             currentMaze += 1
-            if currentMaze == numberOfMazes-1:
+            if currentMaze == numberOfMazes:
                 currentMaze = 0
             pts = deque(maxlen=numberOfPoints)
             mazeData = createMaze(windowHeight, windowWidth, currentMaze)
