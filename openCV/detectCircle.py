@@ -10,8 +10,10 @@ orangeLower = (0, 120, 178)
 orangeUpper= (20, 255, 255)
 greenLower = (50, 100, 100)
 greenUpper = (70, 255, 255)
-whiteUpper = (0,0,255)
-whiteLower = (0,0,100)
+whiteUpper = (255,255,255)
+whiteLower = (100,100,100)
+blueUpper = (135, 255, 255)
+blueLower = (85, 50, 40)
 
 windowHeight = 480
 windowWidth = 640
@@ -30,6 +32,7 @@ capture = cv2.VideoCapture(0)  # Create camera capture object
 mazeData = createMaze(windowHeight, windowWidth, currentMaze)
 mazeImage = mazeData[0]
 templateContours = mazeData[1]
+finishContours = mazeData[2]
 
 #template = cv2.imread("maze.png", 0)
 #templateContours = cv2.findContours(template,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)[-2]
@@ -46,10 +49,10 @@ while True:
     # Test if pointer crossed wall of maze
     # Expensive so only run every 10th frame
     if counter % 10 == 0:
-        dynamicTemplate = cv2.inRange(mazeImage, (100,100,100), (255,255,255))
-        dynContours = cv2.findContours(dynamicTemplate,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)[-2]
-        ret = cv2.matchShapes(templateContours[0],dynContours[0],1,0.0)
-        if(ret != 0):
+
+        wallDiff = compareFrames(templateContours, mazeImage, whiteUpper, whiteLower)
+        #finishDiff = compareFrames(finishContours, mazeImage, blueUpper, blueLower)
+        if(wallDiff != 0):
             print("You hit the wall!")
             touchedWall = True
             counter = 0
