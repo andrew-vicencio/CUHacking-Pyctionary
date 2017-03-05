@@ -29,29 +29,36 @@ def findCenter(mask):
     	center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
     return center, radius
 
-def createMaze(windowHeight, windowWidth):
+
+def createMaze(windowHeight, windowWidth, mazeNumber):
 
 	maze_image = np.zeros((windowHeight,windowWidth,3), np.uint8)
 
+	# Create matrix for maze positions
 	g = [[0 for y in range(6)] for x in range(8)]
 	for x in range(8):
 		for y in range(6):
    			g[x][y] = (x*windowWidth/8, y*windowHeight/6)
 
 	lines = []
-	lines.append([g[1][1],g[1][5],g[3][5],g[3][4],g[3][5],g[6][5],g[6][4],g[5][4],g[5][2],g[6][2],g[3][2]])
-	lines.append([g[2][4],g[2][3],g[4][3],g[4][4]])
-	lines.append([g[2][3],g[2][1],g[7][1],g[7][3],g[6][3],g[7][3],g[7][5]])
+
+	if mazeNumber == 0:
+		lines.append([g[1][1],g[1][5],g[3][5],g[3][4],g[3][5],g[6][5],g[6][4],g[5][4],g[5][2],g[6][2],g[3][2]])
+		lines.append([g[2][4],g[2][3],g[4][3],g[4][4]])
+		lines.append([g[2][3],g[2][1],g[7][1],g[7][3],g[6][3],g[7][3],g[7][5]])
+
+	if mazeNumber == 1:
+		lines.append([g[1][1], g[7][1], g[7][5], g[6][5]])
+		lines.append([g[3][2], g[1][2], g[1][3], g[3][3], g[1][3], g[1][5], g[5][5], g[5][4], g[6][4], g[6][2], g[5][2], g[5][3]])
+		lines.append([g[4][1], g[4][4], g[2][4]])
 
 	for l in range(len(lines)):
    		for i in range(len(lines[l])-1):
    			cv2.line(maze_image, lines[l][i], lines[l][i+1], (255, 255, 255), 10)
 
+   	templateContours = cv2.inRange(maze_image, (100,100,100), (255,255,255))
+   	templateContours = cv2.findContours(templateContours,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)[-2]
+
 	cv2.imwrite("maze.png", maze_image)
 
-	return(maze_image)
-
-
-def compareMaze(frame):
-	im = cv2.imread("maze.png", 0)
-	im2, contours, hierarchy = cv2.findContours(im,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+	return maze_image, templateContours
