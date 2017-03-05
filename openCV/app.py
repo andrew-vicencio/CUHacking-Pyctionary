@@ -26,16 +26,19 @@ def pts():
 
 @app.route('/getmaze', methods=['POST'])
 def newmaze():
+    global activemap
+    activemap+=activemap+1
     maze = open("maze/maze{}.png".format(activemap%5), "rb")
-    if maze.isOpen():
-        return send_file(IO.BytesIO(maze.read()))
-    else:
+    
+    if not maze.isOpen():
         maze.close()
         maze = open("maze/maze0.png")
+    
+    return send_file(IO.BytesIO(maze.read()), metadata="image/png")
 
 @app.route('/')
-def hi():
-    return render_template("hello.html")
+def index():
+    return render_template("index.html")
 
 pid = os.fork();
 if pid:
