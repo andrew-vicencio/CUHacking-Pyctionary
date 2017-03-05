@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        <script type="text/javascript">
+            function getPoints() {
+                    $.ajax({
+                        type: "POST",
+                        contentType: "application/json; charset=utf-8",
+                        url: "/getpts",
+                        success: function(data) {
+                            document.getElementById("test").innerHTML = data.x;
+                        }
+                    });
+            }
+            
+            function go() {
+                setInterval(getPoints, 100)
+            }
+        </script>
+    </head>
+    <body>
+        <button onclick="go()">Click This</button>
+        <p id="test"></p>
+    </body>
+</html>
