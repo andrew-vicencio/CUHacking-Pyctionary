@@ -74,11 +74,11 @@ def createMaze(windowHeight, windowWidth, mazeNumber):
    	cv2.line(maze_image, finish[0][0], finish[0][1], (255, 0, 0), 10)
 
    	templateContours = cv2.inRange(maze_image, (100,100,100), (255,255,255))
-   	templateContours = cv2.findContours(templateContours,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)[-2]
+   	templateContours = cv2.findContours(templateContours,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)[-2]
 
    	finish = cv2.inRange(maze_image, (100,0,0), (255, 0, 0))
    	cv2.imwrite("templateframe.png", finish)
-   	finishContours = cv2.findContours(finish,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)[-2]
+   	finishContours = cv2.findContours(finish,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)[-2]
 
 	cv2.imwrite("maze.png", maze_image)
 
@@ -88,7 +88,7 @@ def compareFrames(templateContours, frame, upperBounds, lowerBounds):
 
 	frameTemplate = cv2.inRange(frame, lowerBounds, upperBounds)
 	cv2.imwrite("frame.png", frameTemplate)
-	frameContours = cv2.findContours(frameTemplate,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)[-2]
+	frameContours = cv2.findContours(frameTemplate,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)[-2]
 	diff = cv2.matchShapes(templateContours[0],frameContours[0],1,0.0)
 	return diff
 
