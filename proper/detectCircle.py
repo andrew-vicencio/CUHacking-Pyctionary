@@ -3,16 +3,16 @@ from collections import deque
 import numpy as np
 import imutils
 import cv2
-from opencvFunc import *
 import time
-
 import os, os.path
+from opencvFunc import *
+
 if os.path.exists('fifo'):
     os.remove('fifo')
 os.mkfifo('fifo')
 fifo = open('fifo', 'w');
 
-orangeLower = (0, 120, 178)
+orangeLower = (0, 120, 130)
 orangeUpper= (20, 255, 255)
 greenLower = (50, 100, 100)
 greenUpper = (70, 255, 255)
@@ -27,6 +27,7 @@ numberOfPoints = 32
 numberOfMazes = 3
 currentMaze = 0
 touchedWall = False
+finished = False
 wallBuffer = 0
 pts = deque(maxlen=numberOfPoints)  # Deque containing last 32 point history
 counter = 0  # Frame counter
@@ -60,6 +61,16 @@ while True:
             print("You hit the wall!")
             touchedWall = True
             counter = 0
+            pts = deque(maxlen=numberOfPoints)
+            mazeData = createMaze(windowHeight, windowWidth, currentMaze)
+            mazeImage = mazeData[0]
+            templateContours = mazeData[1]
+            time.sleep(3)
+
+        if(finishDiff != 0):
+            print("finished!")
+            finished = True
+            counter = 0
             currentMaze += 1
             if currentMaze == numberOfMazes:
                 currentMaze = 0
@@ -69,11 +80,9 @@ while True:
             templateContours = mazeData[1]
             time.sleep(3)
 
-        if(finishDiff != 0):
-            print("finished!")
-
-    if counter > 10 and touchedWall is True:
+    if counter > 10 and (touchedWall is True or finished is True):
         touchedWall = False
+        finished = False
     # find contours in the mask and initialize the current
     # (x, y) center of the ball
     circle = findCenter(mask)
@@ -81,13 +90,13 @@ while True:
     radius = circle[1]
  
         # only proceed if the radius meets a minimum size
-    if radius > 10 and touchedWall is False:
+    if radius > 10 and (touchedWall is False and finished is False):
         # draw the circle and centroid on the frame,
         # then update the list of tracked points
         cv2.circle(frame, center, int(radius), (0, 0, 255), 2)
         cv2.circle(frame, center, 5, (0, 0, 255), -1)
         pts.appendleft(center)  # Append x,y coords of center
-        fifo.write("{}:{}:{}:{}\n".format(pts[0][0], pts[0][1]), touchedWall[activeMaze])
+        fifo.write("{}:{}:{}:{}\n".format(pts[0][0], pts[0][1], int(touchedWall), int(finished)))
         fifo.flush();
 
         # loop over the set of tracked points

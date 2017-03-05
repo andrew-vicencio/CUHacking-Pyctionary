@@ -77,6 +77,7 @@ function getPoints() {
             $("#hwall").text(data.w)
             succ = data.s
             
+            update();
             if(data.w == 1)
                 getBackground()
         }
