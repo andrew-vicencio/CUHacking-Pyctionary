@@ -21,6 +21,9 @@ whiteLower = (100,100,100)
 blueUpper = (255, 0, 0)
 blueLower = (100, 0, 0)
 
+orangeLower = (80,180,110)
+orangeUpper = (140,255,255)
+
 windowHeight = 480
 windowWidth = 640
 numberOfPoints = 32
@@ -79,10 +82,11 @@ while True:
             mazeImage = mazeData[0]
             templateContours = mazeData[1]
             time.sleep(3)
-
     if counter > 10 and (touchedWall is True or finished is True):
         touchedWall = False
         finished = False
+        fifo.flush();
+
     # find contours in the mask and initialize the current
     # (x, y) center of the ball
     circle = findCenter(mask)
@@ -97,7 +101,6 @@ while True:
         cv2.circle(frame, center, 5, (0, 0, 255), -1)
         pts.appendleft(center)  # Append x,y coords of center
         fifo.write("{}:{}:{}:{}\n".format(pts[0][0], pts[0][1], int(touchedWall), int(finished)))
-        fifo.flush();
 
         # loop over the set of tracked points
     for i in np.arange(1, len(pts)):

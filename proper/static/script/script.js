@@ -16,8 +16,8 @@ window.onload = function() {
   pInit();
   uiInit();
 
-  setInterval(update, 1000/24);
-  setInterval(getPoints, 1000/24);
+  setInterval(update, 1000/30);
+  setInterval(getPoints, 1000/30);
   // c.addEventListener('mousemove', function(e) {
   //   var rect = c.getBoundingClientRect();
   //   hand.x = (e.clientX-rect.left)/(rect.right-rect.left)*c.width;
@@ -51,7 +51,7 @@ function pInit() {
   hs = 10;
 
   cc.lineWidth=10;
-  cc.strokeStyle='white';
+  cc.strokeStyle='blue';
   cc.beginPath();
   cc.moveTo(hand.x, hand.y);
 }
