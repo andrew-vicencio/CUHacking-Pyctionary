@@ -2,7 +2,13 @@
 from collections import deque
 import numpy as np
 import imutils
-import cv2
+import cv2, os
+import os.path
+
+if os.path.exists('fifo'):
+    os.remove('fifo')
+os.mkfifo('fifo')
+fifo = open('fifo', 'w');
 
 redUpper = (0, 0, 0)
 redUpper = (0, 0, 0)
@@ -56,6 +62,8 @@ while True:
                 (0, 255, 255), 2)
             cv2.circle(frame, center, 5, (0, 0, 255), -1)
             pts.appendleft(center)  # Append x,y coords of center
+            fifo.write("{}:{}\n".format(pts[0][0], pts[0][1]))
+            fifo.flush();
 
 
             # loop over the set of tracked points
@@ -118,3 +126,5 @@ while True:
  
 capture.release()
 cv2.destroyAllWindows()
+fifo.close()
+os.remove("fifo")
