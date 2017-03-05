@@ -2,19 +2,31 @@ var hand;
 var c;
 var cc;
 var hs;
-var arr;
-var score;
 var lvl;
-var succ;
-var backgrond;
-var date;
+var success;
+var collision;
+var background;
 var sT;
+var time;
+var yay;
+var aww;
+var theme;
 
 window.onload=function() {
   cInit();
   bkgrndInit();
   pInit();
   uiInit();
+
+  // yay = document.createElement("AUDIO");
+  // aww = document.createElement("AUDIO");
+  // theme = document.createElement("AUDIO");
+  //
+  // aww.src = "C:\Users\avice\Documents\Github\CUHacking\CUHacking-Pyctionary\website\music\The Price is Right Losing Horn - Gaming Sound Effect (HD).mp3"
+  // yay.src = "C:\Users\avice\Documents\Github\CUHacking\CUHacking-Pyctionary\website\music\MLG Air Horn Sound Effect FREE.mp3"
+  // theme.src = "C:\Users\avice\Documents\Github\CUHacking\CUHacking-Pyctionary\website\music\Jeopardy Theme.mp3"
+  // theme.autoplay = true;
+  // theme.loop = true;
 
   setInterval(update, 1000/24);
   setInterval(getPoints, 1000/24);
@@ -32,7 +44,7 @@ function cInit() {
   c.width = 640;
   c.height = 480;
   //cc font-size
-  cc.font="50px Georgia"
+  cc.font="50px Georgia";
 }
 
 function bkgrndInit() {
@@ -53,10 +65,10 @@ function pInit() {
 }
 
 function uiInit() {
-  score = 0;
-  lvl = 0;
   sT = performance.now();
-  // window.alert(date.getTime());
+  lvl = 1;
+  collision = false;
+  success = false;
 }
 
 function getPoints() {
@@ -67,27 +79,41 @@ function getPoints() {
             success: function(data) {
                 hand.x = data.x;
                 hand.y = data.y;
+                collision = data.w;
             }
         });
 }
 
 function update() {
   cc.fillStyle='white';
-  // cc.fillRect(0, 0, c.width, c.height);
   cc.drawImage(background, 0, 0);
-  cc.fillText("Score: " + score, c.width/8, c.height - 25);
-  cc.fillText("Level: " + lvl, 3*c.width/5, c.height - 25);
-  if (!succ){
-    cc.fillText("Time: " + Math.floor((performance.now() - sT) / 1000), c.width/2 - 100, 50);
+  // cc.fillText("Level: " + lvl, 3*c.width/5, c.height - 25);
+
+  if (!success){
+    cc.font="50px Georgia"
+    time = Math.floor((performance.now() - sT) / 1000);
+    cc.fillText("Time: " + time, c.width/2 - 100, 50);
+  } else {
+    cc.fillText("You won in " + time + "seconds!", c.width/2 - 80, 50);
+    lvl = 1;
   }
 
-  cc.fillStyle='black';
-  // cc.fillRect(left.x-hs/2, left.y-hs/2, hs, hs);
-  cc.fillRect(hand.x-hs/2, hand.y-hs/2, hs, hs);
-  cc.lineTo(hand.x, hand.y);
-  cc.stroke();
+  if (!collision){
+    cc.fillStyle='black';
+    cc.fillRect(hand.x-hs/2, hand.y-hs/2, hs, hs);
+    cc.lineTo(hand.x, hand.y);
+    cc.stroke();
+  } else {
+    cc.font="25px Georgia"
+    cc.fillText("You lost! Next map loading in " + (2 - time), c.width/2 - 165, c.height-25);
+    setTimeout(changeBackground, 2000);
+  }
 }
 
 function changeBackground() {
-  background.src="";
+  background.src="file:///C:/Users/avice/Documents/Github/CUHacking/CUHacking-Pyctionary/website/images/maze1.png";
+  uiInit();
+  collision = false;
+  sT = performance.now();
+  time = time;
 }

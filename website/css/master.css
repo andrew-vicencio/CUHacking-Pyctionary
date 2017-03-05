@@ -12,8 +12,26 @@ h1 {
   padding: auto;
 }
 
-/*canvas {
-  height: 100vh;;
-  width: 100%;
-  margin:auto;
-}*/
+canvas {
+    padding: 0;
+    margin: auto;
+    display: block;
+    width: 800px;
+    height: 600px;
+    position: absolute;
+    top: 750px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.thin-shade {
+  /*background: #89DFB8;*/
+  font: 6rem 'Montserrat', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.35rem;
+  color: #228B22;
+  text-shadow: -4px 4px 0 #00FF00,
+                      -6px 6px 0 rgba(255,255,255,0.5);
+  text-align:center;
+}
