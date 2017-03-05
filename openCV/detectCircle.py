@@ -2,7 +2,13 @@
 from collections import deque
 import numpy as np
 import imutils
-import cv2
+import cv2, os
+import os.path
+
+if os.path.exists('fifo'):
+    os.remove('fifo')
+os.mkfifo('fifo')
+fifo = open('fifo', 'w');
 
 redUpper = (0, 0, 0)
 redUpper = (0, 0, 0)
@@ -28,7 +34,12 @@ while True:
     (captured, frame) = capture.read()
     
     # Image manipulations to draw out single colour
+<<<<<<< HEAD
     frame = imutils.resize(frame, width=windowWidth) # This is the visual output
+=======
+    frame = imutils.resize(frame, width=900) # This is the visual output
+    frame = cv2.flip(frame,1)
+>>>>>>> 06a2a3517752ce69d0ab22742a856bad59fa509e
     blurred = cv2.GaussianBlur(frame, (11, 11), 0)
     hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv, greenLower, greenUpper)
@@ -59,6 +70,8 @@ while True:
                 (0, 255, 255), 2)
             cv2.circle(frame, center, 5, (0, 0, 255), -1)
             pts.appendleft(center)  # Append x,y coords of center
+            fifo.write("{}:{}\n".format(pts[0][0], pts[0][1]))
+            fifo.flush();
 
 
             # loop over the set of tracked points
@@ -122,3 +135,5 @@ while True:
  
 capture.release()
 cv2.destroyAllWindows()
+fifo.close()
+os.remove("fifo")
