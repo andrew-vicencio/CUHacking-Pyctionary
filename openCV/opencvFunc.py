@@ -43,6 +43,12 @@ def createMaze(windowHeight, windowWidth):
 	lines.append([g[2][4],g[2][3],g[4][3],g[4][4]])
 	lines.append([g[2][3],g[2][1],g[7][1],g[7][3],g[6][3],g[7][3],g[7][5]])
 
+	# lines.append([g[1][1], g[7][1], g[7][5], g[6][5]])
+	# lines.append([g[3][2], g[1][2], g[1][3], g[3][3], g[1][3], g[1][5], g[5][5], g[5][4], g[6][4], g[6][2], g[5][2], g[5][3]])
+	# lines.append([g[4][1], g[4][4], g[2][4])
+
+	# lines.append(([g[1][1], g[1][5], g[]]))
+
 	for l in range(len(lines)):
    		for i in range(len(lines[l])-1):
    			cv2.line(maze_image, lines[l][i], lines[l][i+1], (255, 255, 255), 10)
