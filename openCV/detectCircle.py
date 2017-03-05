@@ -11,6 +11,8 @@ greenUpper = (64, 255, 255)
 redUpper = (0, 0, 0)
 redUpper = (0, 0, 0)
 
+windowHeight = 480
+windowWidth = 640
 numberOfPoints = 32
 pts = deque(maxlen=numberOfPoints)  # Deque containing last 32 point history
 counter = 0  # Frame counter
@@ -18,6 +20,7 @@ counter = 0  # Frame counter
 direction = ""
  
 capture = cv2.VideoCapture(0)  # Create camera capture object
+blank_image = np.zeros((windowHeight,windowWidth,3), np.uint8)
 
 
 while True:
@@ -25,7 +28,7 @@ while True:
     (captured, frame) = capture.read()
     
     # Image manipulations to draw out single colour
-    frame = imutils.resize(frame, width=600) # This is the visual output
+    frame = imutils.resize(frame, width=windowWidth) # This is the visual output
     blurred = cv2.GaussianBlur(frame, (11, 11), 0)
     hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv, greenLower, greenUpper)
@@ -97,7 +100,7 @@ while True:
         # otherwise, compute the thickness of the line and
         # draw the connecting lines
         thickness = int(np.sqrt(numberOfPoints / float(i + 1)) * 2.5)
-        cv2.line(frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
+        cv2.line(blank_image, pts[i - 1], pts[i], (0, 0, 255), thickness)
  
     # show the movement deltas and the direction of movement on
     # the frame
@@ -109,6 +112,7 @@ while True:
  
     # show the frame to our screen and increment the frame counter
     cv2.imshow("Pyctionary", frame)
+    cv2.imshow("Drawing", blank_image)
     key = cv2.waitKey(1) & 0xFF
     counter += 1
  
