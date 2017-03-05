@@ -15,11 +15,12 @@ whiteLower = (0,0,100)
 windowHeight = 480
 windowWidth = 640
 numberOfPoints = 32
+numberOfMazes = 3
 pts = deque(maxlen=numberOfPoints)  # Deque containing last 32 point history
 counter = 0  # Frame counter
 (dX, dY) = (0, 0)  # Velocity of movement in x,y directions
 direction = ""
-touchedWall = False
+touchedWall = [False for i in range(numberOfMazes)]
  
 capture = cv2.VideoCapture(0)  # Create camera capture object
 # Blank image for drawing shapes
@@ -45,8 +46,8 @@ while True:
         ret = cv2.matchShapes(templateContours[0],dynContours[0],1,0.0)
         if(ret != 0):
             print("You hit the wall!")
-            touchedWall = True
-            break
+            touchedWall[0] = True
+
  
     # find contours in the mask and initialize the current
     # (x, y) center of the ball
