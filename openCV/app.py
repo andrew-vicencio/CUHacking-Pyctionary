@@ -17,8 +17,9 @@ def pts():
         cord = data.split(":")
         x = int(cord[0])
         y = int(cord[1])
-        return jsonify(x=x, y=y, e=0)
-    return jsonify(x=0, y=0, e=1)
+        w = int(cord[2])
+        return jsonify(x=x, y=y, w=w, e=0)
+    return jsonify(x=0, y=0, w=0, e=1)
 
 @app.route('/')
 def hi():

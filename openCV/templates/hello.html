@@ -9,7 +9,9 @@
                         contentType: "application/json; charset=utf-8",
                         url: "/getpts",
                         success: function(data) {
-                            document.getElementById("test").innerHTML = data.x;
+                            $("#x_pos").text(data.x)
+                            $("#y_pos").text(data.y)
+                            $("#hwall").text(data.y)
                         }
                     });
             }
@@ -19,8 +21,19 @@
             }
         </script>
     </head>
-    <body>
-        <button onclick="go()">Click This</button>
-        <p id="test"></p>
+    <body onload="go()">
+        <div id="header">
+            <span>Maze</span>
+        </div>
+        <div id="imagespace">
+            <canvas id="canvas">
+                
+            </canvas>
+        </div>
+        <div id="imageinfo">
+            <p>X: <span id="x_pos">0</span></p>
+            <p>Y: <span id="y_pos">0</span></p>
+            <p>W: <span id="hwall">0</span></p>
+        </div>
     </body>
 </html>
