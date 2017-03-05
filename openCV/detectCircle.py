@@ -4,12 +4,14 @@ import numpy as np
 import imutils
 import cv2
 
-# define the lower and upper boundaries of the "green"
-# ball in the HSV color space
+redUpper = (0, 0, 0)
+redUpper = (0, 0, 0)
 greenLower = (29, 86, 6)
 greenUpper = (64, 255, 255)
+redUpper = (0, 0, 0)
+redUpper = (0, 0, 0)
+
 numberOfPoints = 32
- 
 pts = deque(maxlen=numberOfPoints)  # Deque containing last 32 point history
 counter = 0  # Frame counter
 (dX, dY) = (0, 0)  # Velocity of movement in x,y directions
@@ -17,19 +19,15 @@ direction = ""
  
 capture = cv2.VideoCapture(0)  # Create camera capture object
 
+
 while True:
-    # grab the current frame
-    (grabbed, frame) = capture.read()
- 
-    # resize the frame, blur it, and convert it to the HSV
-    # color space
-    frame = imutils.resize(frame, width=600)
+    # get the current frame
+    (captured, frame) = capture.read()
+    
+    # Image manipulations to draw out single colour
+    frame = imutils.resize(frame, width=600) # This is the visual output
     blurred = cv2.GaussianBlur(frame, (11, 11), 0)
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
- 
-    # construct a mask for the color "green", then perform
-    # a series of dilations and erosions to remove any small
-    # blobs left in the mask
+    hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv, greenLower, greenUpper)
     mask = cv2.erode(mask, None, iterations=2)
     mask = cv2.dilate(mask, None, iterations=2)
@@ -70,7 +68,7 @@ while True:
  
         # check to see if enough points have been accumulated in
         # the buffer
-        if counter >= 100 and i == 1:
+        if counter >= 10 and i == 1 and len(pts) > 15:
             # compute the difference between the x and y
             # coordinates and re-initialize the direction
             # text variables
@@ -110,7 +108,7 @@ while True:
         0.35, (0, 0, 255), 1)
  
     # show the frame to our screen and increment the frame counter
-    cv2.imshow("Frame", frame)
+    cv2.imshow("Pyctionary", frame)
     key = cv2.waitKey(1) & 0xFF
     counter += 1
  
