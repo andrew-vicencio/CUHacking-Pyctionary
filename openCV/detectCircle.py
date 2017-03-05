@@ -31,7 +31,8 @@ while True:
     (captured, frame) = capture.read()
     
     # Image manipulations to draw out single colour
-    frame = imutils.resize(frame, width=600) # This is the visual output
+    frame = imutils.resize(frame, width=900) # This is the visual output
+    frame = cv2.flip(frame,1)
     blurred = cv2.GaussianBlur(frame, (11, 11), 0)
     hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv, greenLower, greenUpper)
