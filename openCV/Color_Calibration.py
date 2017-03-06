@@ -4,11 +4,12 @@ import cv2
 from opencvFunc import *
 
 windowName = "Colour Calibration"
-lowerBound = [29, 86, 6]
-upperBound = [64, 255, 255]
+barNames = ["Hue Max", "Hue Min", "Sat Max", "Sat Min", "Value Max", "Value Min"]
+maxV = [180, 180, 255, 255, 255, 255]
+lowerBound = [79, 116, 176]
+upperBound = [114, 255, 255]
 	
 def trackbarEvent(foo):
-	barNames = ["Hue Max", "Hue Min", "Sat Max", "Sat Min", "Value Max", "Value Min"]
 	for i in range(6):
 		if i % 2 == 0:
 			upperBound[i/2] = cv2.getTrackbarPos(barNames[i], windowName)
@@ -17,12 +18,12 @@ def trackbarEvent(foo):
 
 
 cv2.namedWindow(windowName)
-cv2.createTrackbar("Hue Max", windowName, 0, 180, trackbarEvent)
-cv2.createTrackbar("Hue Min", windowName, 0, 180, trackbarEvent)
-cv2.createTrackbar("Sat Max", windowName, 0, 255, trackbarEvent)
-cv2.createTrackbar("Sat Min", windowName, 0, 255, trackbarEvent)
-cv2.createTrackbar("Value Max", windowName, 0, 255, trackbarEvent)
-cv2.createTrackbar("Value Min", windowName, 0, 255, trackbarEvent)
+
+for i in range(6):
+	if i % 2 == 0:
+		cv2.createTrackbar(barNames[i], windowName, upperBound[i/2], maxV[i], trackbarEvent)
+	else:	
+		cv2.createTrackbar(barNames[i], windowName, lowerBound[(i-1)/2], maxV[i], trackbarEvent)
 
 capture = cv2.VideoCapture(0)
 
@@ -36,6 +37,8 @@ while True:
 
 	key = cv2.waitKey(1) & 0xFF
 	if key == ord("q"):
+		print(tuple(lowerBound))
+		print(tuple(upperBound))
 		break
  
 capture.release()

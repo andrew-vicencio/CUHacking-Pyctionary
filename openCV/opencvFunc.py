@@ -8,8 +8,8 @@ def processFrame(frame, windowWidth, upperBounds, lowerBounds):
 	blurred = cv2.GaussianBlur(Wframe, (11, 11), 0)
 	hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
 	mask = cv2.inRange(hsv, lowerBounds, upperBounds)
-	mask = cv2.erode(mask, None, iterations=2)
-	mask = cv2.dilate(mask, None, iterations=2)
+	erode = cv2.erode(mask, None, iterations=2)
+	dilate = cv2.dilate(erode, None, iterations=2)
 	return mask
 
 def findCenter(mask):
@@ -26,7 +26,13 @@ def findCenter(mask):
     	c = max(cnts, key=cv2.contourArea)
     	((x, y), radius) = cv2.minEnclosingCircle(c)
     	M = cv2.moments(c)
-    	center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
+    	if M["m00"] != 0:
+    		center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
+    	# Sometimes M["m00"] is 0 and raises division error; in this case reject point w/
+    	# rad < 10
+    	else:
+    		center = (0,0)
+    		radius = 0
     return center, radius
 
 
@@ -70,7 +76,7 @@ def createMaze(windowHeight, windowWidth, mazeNumber):
    		for i in xrange(len(lines[l])-1):
    			cv2.line(maze_image, lines[l][i], lines[l][i+1], (255, 255, 255), 10)
    	
-   	cv2.line(maze_image, start[0][0], start[0][1], (255, 0, 0), 10)
+   	cv2.line(maze_image, start[0][0], start[0][1], (0, 0, 255), 10)
    	cv2.line(maze_image, finish[0][0], finish[0][1], (255, 0, 0), 10)
 
    	templateContours = cv2.inRange(maze_image, (100,100,100), (255,255,255))

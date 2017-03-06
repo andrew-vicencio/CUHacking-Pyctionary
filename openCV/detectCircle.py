@@ -8,8 +8,8 @@ import time
 
 orangeLower = (0, 120, 130)
 orangeUpper= (20, 255, 255)
-greenLower = (50, 100, 100)
-greenUpper = (70, 255, 255)
+greenLower = (79, 116, 176)
+greenUpper = (114, 255, 255)
 whiteUpper = (255,255,255)
 whiteLower = (100,100,100)
 blueUpper = (255, 0, 0)
@@ -43,7 +43,7 @@ while True:
     frame = cv2.flip(frame, 1)
     
     # Image manipulations to draw out single colour
-    mask = processFrame(frame, windowWidth, orangeUpper, orangeLower)
+    mask = processFrame(frame, windowWidth, greenUpper, greenLower)
     
     # Test if pointer crossed wall of maze
     # Expensive so only run every 10th frame
@@ -51,17 +51,18 @@ while True:
 
         wallDiff = compareFrames(templateContours, mazeImage, whiteUpper, whiteLower)
         finishDiff = compareFrames(finishContours, mazeImage, blueUpper, blueLower)
-        if(wallDiff != 0):
+        
+        # If you hit the wall
+        if(wallDiff != 0 and touchedWall is False):
             print("You hit the wall!")
             touchedWall = True
             counter = 0
             pts = deque(maxlen=numberOfPoints)
-            mazeData = createMaze(windowHeight, windowWidth, currentMaze)
-            mazeImage = mazeData[0]
-            templateContours = mazeData[1]
-            time.sleep(3)
+            cv2.putText(mazeImage, "You Lose!", (10, 470), cv2.FONT_HERSHEY_SIMPLEX, 2, (0,0,255), 5)
+            cv2.imshow("Drawing", mazeImage)
 
-        if(finishDiff != 0):
+        # If you make it to the finish
+        if(finishDiff != 0 and finished is False):
             print("finished!")
             finished = True
             counter = 0
@@ -69,14 +70,28 @@ while True:
             if currentMaze == numberOfMazes:
                 currentMaze = 0
             pts = deque(maxlen=numberOfPoints)
-            mazeData = createMaze(windowHeight, windowWidth, currentMaze)
-            mazeImage = mazeData[0]
-            templateContours = mazeData[1]
-            time.sleep(3)
+            cv2.putText(mazeImage, "Finished!", (10, 470), cv2.FONT_HERSHEY_SIMPLEX, 2, (0,255,0), 5)
+            cv2.imshow("Drawing", mazeImage)
 
-    if counter > 10 and (touchedWall is True or finished is True):
+    # Couple seconds to get ready after reset
+    if counter < 100 and (touchedWall is True or finished is True):
+
+        text = ["Rst", "3..", "2..", "1.."]
+        if finished == True:
+            text[0] = "Nxt"
+
+        i = counter/20
+        iF = counter/float(20)
+        if i == iF and i != 0:
+            cv2.putText(mazeImage, text[i-1], (150+i*80, 60), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0,0,255), 3)
+
+    # Buffer for resets so old frames don't screw up new images       
+    if counter >= 100 and (touchedWall is True or finished is True):
         touchedWall = False
         finished = False
+        mazeData = createMaze(windowHeight, windowWidth, currentMaze)
+        mazeImage = mazeData[0]
+        templateContours = mazeData[1]
     # find contours in the mask and initialize the current
     # (x, y) center of the ball
     circle = findCenter(mask)
