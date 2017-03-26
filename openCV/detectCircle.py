@@ -6,6 +6,13 @@ import cv2
 from opencvFunc import *
 import time
 
+import os, os.path
+
+if os.path.exists('fifo'):
+    os.remove('fifo')
+os.mkfifo('fifo')
+fifo = open('fifo', 'w');
+
 orangeLower = (0, 120, 130)
 orangeUpper= (20, 255, 255)
 greenLower = (79, 116, 176)
@@ -51,6 +58,9 @@ while True:
 
         wallDiff = compareFrames(templateContours, mazeImage, whiteUpper, whiteLower)
         finishDiff = compareFrames(finishContours, mazeImage, blueUpper, blueLower)
+        
+        fifo.write("{}:{}:{}:{}:{}\n".format(pts[0][0], pts[0][1]), int(touchedWall), 0)
+        fifo.flush();
         
         # If you hit the wall
         if(wallDiff != 0 and touchedWall is False):
@@ -141,3 +151,5 @@ while True:
  
 capture.release()
 cv2.destroyAllWindows()
+fifo.close()
+os.remove("fifo")
